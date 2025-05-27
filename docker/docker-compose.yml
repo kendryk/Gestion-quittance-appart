@@ -1,0 +1,76 @@
+version: '3'
+services:
+  mariadb:
+    image: mariadb:10.3
+    container_name: mariadb
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_PASSWORD: root
+    networks:
+      - database
+    restart: always
+    volumes:
+      - ./maria_custom_conf:/etc/mysql/conf.d
+      - mariadb_data:/var/lib/mysql
+      - ../data/gestion_acces.sql:/docker-entrypoint-initdb.d/gestion_acces.sql
+      - ../data/gestion_acces_data.sql:/docker-entrypoint-initdb.d/gestion_acces_data.sql
+    ports:
+      - 6666:3306
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    container_name: PhpMyAdmin
+    environment:
+      - PMA_HOST=mariadb
+      - TZ='Europe/Paris'
+    restart: always
+    ports:
+      - 667:80
+    networks:
+      - database
+    volumes:
+      - ./sessions:/sessions
+    depends_on:
+      - mariadb
+
+  adminer:
+    image: adminer:latest
+    container_name: Adminer
+    depends_on:
+      - mariadb
+    environment:
+      ADMINER_DEFAULT_DB_DRIVER: mysql
+      ADMINER_DEFAULT_DB_HOST: mariadb
+      ADMINER_DESIGN: nette
+      ADMINER_PLUGINS: tables-filter tinymce
+    networks:
+      - database
+    ports:
+      - 668:8080
+
+  portainer:
+    image: portainer/portainer-ce:latest
+    container_name: portainer
+    command: -H unix:///var/run/docker.sock
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer_data:/data
+    ports:
+      - 9000:9000
+    networks:
+      - database
+
+  mailhog:
+    image: mailhog/mailhog
+    restart: always
+    ports:
+      - 1025:1025
+      - 8025:8025
+
+volumes:
+  mariadb_data:
+  portainer_data:
+
+networks:
+  database:
+
