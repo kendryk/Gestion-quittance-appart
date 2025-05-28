@@ -1,0 +1,49 @@
+server:
+  port: 8080
+
+spring:
+  datasource:
+    url: jdbc:mariadb://localhost:6666/Gestion_Acces
+    username: root
+    password: root
+    driver-class-name: org.mariadb.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+  main:
+    allow-bean-definition-overriding: true
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui/index.html
+
+# Configuration spécifique métier
+quittance:
+  service:
+    email:
+      enabled: true
+      smtp:
+        host: smtp.gmail.com
+        port: 587
+        username: ${EMAIL_USERNAME:}
+        password: ${EMAIL_PASSWORD:}
+
+    pdf:
+      template-path: classpath:/templates/quittance-template.html
+      output-directory: /tmp/quittances
+      repertoire: C:/new/PDF/
+
+    validation:
+      montant-min: 0.01
+      montant-max: 10000.00
+
+# Configuration des tâches schedulées
+scheduling:
+  quittance:
+    generation-automatique: "0 0 1 * * ?" # 1er de chaque mois à minuit
+    relance-impayees: "0 0 9 * * MON" # Tous les lundis à 9h
+
+

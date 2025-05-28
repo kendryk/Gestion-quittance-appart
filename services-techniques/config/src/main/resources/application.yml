@@ -1,0 +1,22 @@
+spring:
+  profiles:
+    active: native
+  application:
+    name: config
+  cloud:
+    config:
+      server:
+        native:
+          searchLocations: "classpath:/config"
+
+  datasource:
+    password: ENC(encrypted_password)
+  springdoc:
+    swagger-ui:
+      path: /swagger-ui.html
+    api-docs:
+      path: /v3/api-docs
+
+
+server:
+  port: 8888

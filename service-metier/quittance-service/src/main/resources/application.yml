@@ -1,0 +1,24 @@
+spring:
+  application:
+    name: quittance-service
+  profiles:
+    active: dev
+  config:
+    import: "optional:configserver:http://localhost:8888"  # Config Server URL
+  cloud:
+    config:
+      enabled: true
+      fail-fast: true # Arrêter si le Config Server n'est pas accessible
+      retry:
+        initial-interval: 1000
+        max-attempts: 5
+
+# Fallback si Config Server est indisponible
+server:
+  port: 8081
+
+logging:
+  level:
+    root: INFO
+    org.springframework.boot.autoconfigure.jdbc: DEBUG
+    com.zaxxer.hikari: DEBUG

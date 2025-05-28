@@ -1,0 +1,1884 @@
+openapi: "3.0.0"
+info:
+  title: "API de Gestion de Quittances de Loyer"
+  version: "1.0.0"
+  description: "Api pour la gestion des quittances de loyer, des utilisateurs, des appartements"
+servers:
+  - url: '/api/gestion-acces'
+tags:
+  - name: "Utilisateur"
+    description: "Gestion des utilisateurs"
+  - name: "Gestionnaire appartement"
+    description: "Gestion des appartements"
+  - name: "Locataire"
+    description: "Gestion des Locataires"
+  - name: "Occupation"
+    description: "Gestion des Occupations"
+  - name: "Quittance"
+    description: "Gestion des quittances"
+  - name: "Document"
+    description: "Gestion des Documents"
+
+paths:
+  /utilisateurs:
+    get:
+      tags:
+        - Utilisateur
+      summary: "Récupère la liste de tous les utilisateurs"
+      description: "Accessible uniquement aux utilisateurs ayant un rôle 'Admin'"
+      operationId: "getUtilisateurs"
+      responses:
+        "200":
+          description: "Liste des utilisateurs récupérée avec succès."
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/UtilisateurDto"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NOTFOUND"
+        "500":
+          $ref: "#/components/responses/InternalError"
+      security:
+        - bearer-key: []
+
+    post:
+      tags:
+        - Utilisateur
+      summary: "Créer un nouvel utilisateur."
+      operationId: "creeUtilisateur"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UtilisateurDto'
+      responses:
+        "201":
+          description: "Compte utilisateur créé avec succès."
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    description: "Identifiant unique généré pour l'utilisateur."
+                  message:
+                    type: string
+                    example: "Utilisateur créé avec succès."
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NOTFOUND"
+        "500":
+          $ref: "#/components/responses/InternalError"
+      security:
+        - bearer-key: []
+
+  /utilisateurs/{utilisateurId}:
+    get:
+      tags:
+        - Utilisateur
+      summary: "Récupére un utilisateur par son ID"
+      description: "Accessible uniquement aux utilisateurs ayant un rôle 'Admin'"
+      operationId: "getUtilisateurById"
+      parameters:
+        - name: utilisateurId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: "Utilisateur récupéré avec succès."
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/UtilisateurDto'
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NOTFOUND"
+        "500":
+          $ref: "#/components/responses/InternalError"
+      security:
+        - bearer-key: [ ]
+
+    put:
+      tags:
+        - Utilisateur
+      summary: "Mettre à jour un utilisateur."
+      description: "Accessible uniquement aux utilisateurs ayant un rôle 'Admin'"
+      operationId: "updateUtilisateurById"
+      parameters:
+        - name: utilisateurId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UtilisateurUpdateDto'
+      responses:
+        '200':
+          description: "Mise à jour réussie."
+          $ref: "#/components/responses/OK"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NOTFOUND"
+        "500":
+          $ref: "#/components/responses/InternalError"
+      security:
+        - bearer-key: [ ]
+
+    patch:
+      tags:
+        - Utilisateur
+      summary: "Marquer un utilisateur comme supprimé (soft delete)"
+      description: "L'utilisateur n'est pas physiquement supprimé de la base de données mais son statut est mis à jour."
+      operationId: "softDeleteUtilisateur"
+      parameters:
+        - name: utilisateurId
+          in: path
+          required: true
+          schema:
+            type: string
+            description: L'identifant du compte à modifier
+            example: john.doe@test.com
+      responses:
+        200:
+          $ref: '#/components/responses/OK'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        403:
+          $ref: '#/components/responses/Forbidden'
+        404:
+          $ref: '#/components/responses/NOTFOUND'
+        500:
+          $ref: '#/components/responses/InternalError'
+      security:
+        - bearer-key: []
+
+  /utilisateurs/{utilisateurId}/locataires:
+    get:
+      tags:
+        - Utilisateur
+      summary: "Liste des locataires par utilisateur"
+      operationId: "getLocatairesByUtilisateurId"
+      parameters:
+        - name: utilisateurId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: "Liste récupérée avec succès."
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LocatairesParUtilisateurDto'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        403:
+          $ref: '#/components/responses/Forbidden'
+        404:
+          $ref: '#/components/responses/NOTFOUND'
+        500:
+          $ref: '#/components/responses/InternalError'
+      security:
+        - bearer-key: [ ]
+
+  /gestionappartement/appartements:
+    get:
+      tags:
+        - Gestionnaire appartement
+      summary: "Récupère la liste de tous les appartements disponibles."
+      operationId: "getAppartements"
+      responses:
+        '200':
+          description: "Liste des appartements récupérée avec succès."
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AppartementDto'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        403:
+          $ref: '#/components/responses/Forbidden'
+        404:
+          $ref: '#/components/responses/NOTFOUND'
+        500:
+          $ref: '#/components/responses/InternalError'
+      security:
+        - bearer-key: [ ]
+
+  /gestionappartement/utilisateurs/{utilisateurId}/appartements:
+    get:
+      tags:
+        - Gestionnaire appartement
+      summary: "Liste des appartements d'un utilisateur"
+      operationId: "listAppartementsByUtilisateur"
+      parameters:
+        - name: utilisateurId
+          in: path
+          required : true
+          schema:
+            type: integer
+            format: int64
+            description: "Identifiant de l'utilisateur"
+      responses:
+        '200':
+          description: "Liste récupérée avec succès."
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AppartementDto'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        403:
+          $ref: '#/components/responses/Forbidden'
+        404:
+          $ref: '#/components/responses/NOTFOUND'
+        500:
+          $ref: '#/components/responses/InternalError'
+      security:
+        - bearer-key: [ ]
+
+    post:
+      tags:
+        - Gestionnaire appartement
+      summary: "Création d'un appartement lié à un utilisateur existant"
+      description: "Accessible uniquement aux administrateurs"
+      operationId: "createAppartementForUtilisateur"
+      parameters:
+        - name: utilisateurId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+            description: "Identifiant unique de l'utilisateur auquel l'appartement sera lié."
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AppartementDto'
+            example:
+              adresse: "123 Rue de Paris"
+              codePostal: 45
+              nombrePieces: 4
+              surface: 75
+              montantLoyer: 1200
+      responses:
+        '201':
+          description: "Appartement créé avec succès."
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    description: "Identifiant unique de l'appartement créé."
+                  message:
+                    type: string
+                    example: "Appartement ajouté avec succès."
+        400:
+          $ref: '#/components/responses/BadRequest'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        403:
+          $ref: '#/components/responses/Forbidden'
+        404:
+          $ref: '#/components/responses/NOTFOUND'
+        500:
+          $ref: '#/components/responses/InternalError'
+      security:
+        - bearer-key: [ ]
+
+  /gestionappartement/appartements/{appartementId}/gestionnaire:
+    get:
+      tags:
+        - Gestionnaire appartement
+      summary: "Récupère le gestionnaire associé à un appartement"
+      operationId: "getGestionnaireByAppartement"
+      parameters:
+        - name: appartementId
+          in: path
+          required: true
+          schema:
+            type: string
+            description: "Identifiant unique de l'appartement"
+      responses:
+        '200':
+          description: "Gestionnaire récupéré avec succès."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UtilisateurDto'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        403:
+          $ref: '#/components/responses/Forbidden'
+        404:
+          $ref: '#/components/responses/NOTFOUND'
+        500:
+          $ref: '#/components/responses/InternalError'
+      security:
+        - bearer-key: [ ]
+
+  /gestionappartement/appartements/{appartementId}:
+    get:
+      tags:
+        - Gestionnaire appartement
+      summary: "Récupère un appartement en fonction de son ID."
+      operationId: "getAppartementById"
+      parameters:
+        - name: appartementId
+          in: path
+          required: true
+          schema:
+            type: string
+            description: "Identifiant unique de l'appartement"
+      responses:
+        '200':
+          description: "Détails de l'appartement récupérés avec succès."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppartementDto'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        403:
+          $ref: '#/components/responses/Forbidden'
+        404:
+          $ref: '#/components/responses/NOTFOUND'
+        500:
+          $ref: '#/components/responses/InternalError'
+      security:
+        - bearer-key: [ ]
+
+    put:
+      tags:
+        - Gestionnaire appartement
+      summary: "Met à jour les informations du gestionnaire d'un appartement"
+      description: "Met à jour les informations du gestionnaire d'un appartement"
+      operationId: "updateAppartement"
+      parameters:
+        - name: appartementId
+          in: path
+          required: true
+          schema:
+            type: string
+            description: "Identifiant unique de l'appartement"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AppartementDto'
+      responses:
+        '200':
+          description: "Gestionnaire modifié avec succès."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppartementDto'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        403:
+          $ref: '#/components/responses/Forbidden'
+        404:
+          $ref: '#/components/responses/NOTFOUND'
+        500:
+          $ref: '#/components/responses/InternalError'
+        502:
+          $ref: '#/components/responses/BadResponse'
+        503:
+          $ref: '#/components/responses/Unavailable'
+        504:
+          $ref: '#/components/responses/Timeout'
+      security:
+        - bearer-key: [ ]
+
+    patch:
+      tags:
+        - Gestionnaire appartement
+      summary: "Marquer un appartement comme supprimé."
+      operationId: "softDeleteAppartement"
+      parameters:
+        - name: appartementId
+          in: path
+          required: true
+          schema:
+            type: string
+            description: "Identifiant unique de l'appartement"
+      responses:
+        200:
+          description: "Appartement marqué comme supprimé avec succès."
+          $ref: '#/components/responses/OK'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        403:
+          $ref: '#/components/responses/Forbidden'
+        404:
+          $ref: '#/components/responses/NOTFOUND'
+        500:
+          $ref: '#/components/responses/InternalError'
+      security:
+        - bearer-key: [ ]
+
+  /locataires:
+    get:
+      tags:
+        - Locataire
+      summary: "Récupère la liste des locataires existants"
+      description: "Accessible uniquement aux administrateurs ou gestionnaires bénéficiant des droits appropriés."
+      operationId: "getLocataires"
+      responses:
+        "200":
+          description: "Liste des locataires récupérée avec succès."
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/LocataireDto"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NOTFOUND"
+        "500":
+          $ref: "#/components/responses/InternalError"
+      security:
+        - bearer-key: [ ]
+
+    post:
+      tags:
+        - Locataire
+      summary: "Créer un nouveau locataire."
+      operationId: "creeLocataire"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LocataireDto'
+      responses:
+        '201':
+          description: "Locataire créé avec succès."
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    description: "Identifiant du locataire créé."
+                  message:
+                    type: string
+                    example: "Locataire ajouté avec succès."
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NOTFOUND"
+        "500":
+          $ref: "#/components/responses/InternalError"
+      security:
+        - bearer-key: [ ]
+
+  /locataires/{locataireId}:
+    get:
+      tags:
+        - Locataire
+      summary: "Obtenir les informations d'un locataire spécifique"
+      operationId: "getLocataireById"
+      parameters:
+        - name: locataireId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: "Locataire récupéré avec succès."
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/LocataireDto'
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NOTFOUND"
+        "500":
+          $ref: "#/components/responses/InternalError"
+      security:
+        - bearer-key: [ ]
+
+    put:
+      tags:
+        - Locataire
+      summary: "Mettre à jour un locataire existant"
+      operationId: "updateLocataireById"
+      parameters:
+        - name: locataireId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LocataireUpdateDto'
+      responses:
+        '200':
+          description: "Mise à jour effectuée avec succès."
+          $ref: '#/components/responses/OK'
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NOTFOUND"
+        "500":
+          $ref: "#/components/responses/InternalError"
+      security:
+        - bearer-key: [ ]
+
+    delete:
+      tags:
+        - Locataire
+      summary: "Supprime un locataire (soft delete)"
+      operationId: "deleteLocataire"
+      parameters:
+        - name: locataireId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+            description: "Identifiant unique du locataire à supprimer."
+      responses:
+        '200':
+          description: "Locataire supprimé avec succès."
+          $ref: '#/components/responses/OK'
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NOTFOUND"
+        "500":
+          $ref: "#/components/responses/InternalError"
+      security:
+        - bearer-key: [ ]
+
+  /occupations:
+    get:
+      tags:
+        - Occupation
+      summary: "Récupère la liste de toutes les occupations"
+      operationId: "getOccupations"
+      responses:
+        "200":
+          description: "Liste des occupations récupérée avec succès."
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/OccupationDto"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NOTFOUND"
+        "500":
+          $ref: "#/components/responses/InternalError"
+      security:
+        - bearer-key: [ ]
+
+    post:
+      tags:
+        - Occupation
+      summary: "Créer une nouvelle occupation."
+      operationId: "creeOccupation"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OccupationCreationDto'
+      responses:
+        "200":
+          description: "Occupation créée avec succès."
+          content:
+            application/json:
+              schema:
+                type: "integer"
+                example: 123
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NOTFOUND"
+        "500":
+          $ref: "#/components/responses/InternalError"
+      security:
+        - bearer-key: [ ]
+
+  /occupations/{occupationId}:
+    get:
+      tags:
+        - Occupation
+      summary: "Récupère une occupation par son ID"
+      operationId: "getOccupationById"
+      parameters:
+        - name: occupationId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: "Occupation récupérée avec succès."
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/OccupationDto'
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NOTFOUND"
+        "500":
+          $ref: "#/components/responses/InternalError"
+      security:
+        - bearer-key: [ ]
+
+    put:
+      tags:
+        - Occupation
+      summary: "Met à jour une occupation"
+      operationId: "updateOccupationById"
+      parameters:
+        - name: occupationId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OccupationCreationDto'
+      responses:
+        '200':
+          $ref: '#/components/responses/OK'
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NOTFOUND"
+        "500":
+          $ref: "#/components/responses/InternalError"
+      security:
+        - bearer-key: [ ]
+
+    delete:
+      tags:
+        - Occupation
+      summary: "Supprime une occupation"
+      operationId: "deleteOccupation"
+      parameters:
+        - name: occupationId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          $ref: '#/components/responses/OK'
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NOTFOUND"
+        "500":
+          $ref: "#/components/responses/InternalError"
+      security:
+        - bearer-key: [ ]
+
+  /gestionquittances:
+    get:
+      tags:
+        - Quittance
+      summary: "Récupère la liste de tous les quittances"
+      description: "Accessible uniquement aux utilisateurs ayant un rôle 'Admin'"
+      operationId: "getQuittances"
+      responses:
+        "200":
+          description: "Liste des Quittances récupérée avec succès."
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/QuittanceDto"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NOTFOUND"
+        "500":
+          $ref: "#/components/responses/InternalError"
+      security:
+        - bearer-key: []
+
+    post:
+      tags:
+        - Quittance
+      summary: "Créer une nouvelle quittance."
+      operationId: "creeQuittance"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QuittanceCreationDto'
+      responses:
+        "200":
+          description: "Quittance créé avec succès."
+          content:
+            application/json:
+              schema:
+                type: "integer"
+                example: 123
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NOTFOUND"
+        "500":
+          $ref: "#/components/responses/InternalError"
+      security:
+        - bearer-key: []
+
+  /gestionquittances/{quittanceId}:
+    get:
+      tags:
+        - Quittance
+      summary: "Récupére une Quittance par son ID"
+      description: "Accessible uniquement aux utilisateurs ayant un rôle 'Admin'"
+      operationId: "getQuittanceById"
+      parameters:
+        - name: quittanceId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: "Quittance récupéré avec succès."
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/QuittanceDto'
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NOTFOUND"
+        "500":
+          $ref: "#/components/responses/InternalError"
+      security:
+        - bearer-key: [ ]
+
+    put:
+      tags:
+        - Quittance
+      summary: "Met à jour une Quittance"
+      description: "Accessible uniquement aux utilisateurs ayant un rôle 'Admin'"
+      operationId: "updateQuittanceById"
+      parameters:
+        - name: quittanceId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QuittanceDto'
+      responses:
+        '200':
+          description: "Quittance mise à jour avec succès."
+          $ref: "#/components/responses/OK"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NOTFOUND"
+        "500":
+          $ref: "#/components/responses/InternalError"
+      security:
+        - bearer-key: [ ]
+
+    patch:
+      tags:
+        - Quittance
+      summary: "Met à jour une  Quittance comme supprimé (soft delete)"
+      description: "L'utilisateur n'est pas physiquement supprimé de la base de données mais son statut est mis à jour."
+      operationId: "softDeleteQuittance"
+      parameters:
+        - name: quittanceId
+          in: path
+          required: true
+          schema:
+            type: string
+            description: L'identifant de la Quittance à modifier
+      responses:
+        200:
+          $ref: '#/components/responses/OK'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        403:
+          $ref: '#/components/responses/Forbidden'
+        404:
+          $ref: '#/components/responses/NOTFOUND'
+        500:
+          $ref: '#/components/responses/InternalError'
+      security:
+        - bearer-key: [ ]
+
+    delete:
+      tags:
+        - Quittance
+      summary: "Supprime une quittance existante"
+      operationId: "deleteQuittance"
+      parameters:
+        - name: quittanceId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+            description: "Identifiant unique de la quittance à supprimer."
+      responses:
+        '200':
+          description: "Quittance supprimée avec succès."
+          $ref: "#/components/responses/OK"
+        '404':
+          $ref: "#/components/responses/NOTFOUND"
+        '500':
+          $ref: "#/components/responses/InternalError"
+      security:
+        - bearer-key: [ ]
+
+  /documents/PDF:
+    get:
+      tags:
+        - Document
+      summary: "Récupère la liste de tous les Documents"
+      description: "Accessible uniquement aux utilisateurs ayant un rôle 'Admin'"
+      operationId: "getDocuments"
+      responses:
+        "200":
+          description: "Liste des Documents récupérée avec succès."
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/DocumentDto"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NOTFOUND"
+        "500":
+          $ref: "#/components/responses/InternalError"
+      security:
+        - bearer-key: [ ]
+
+    post:
+      tags:
+        - Document
+      summary: "Créer un nouveau Document."
+      operationId: "creeDocument"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DocumentDto'
+      responses:
+        "200":
+          description: "Document créé avec succès."
+          content:
+            application/json:
+              schema:
+                type: "integer"
+                example: 123
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NOTFOUND"
+        "500":
+          $ref: "#/components/responses/InternalError"
+      security:
+        - bearer-key: [ ]
+
+  /documents/PDF/{documentId}:
+    get:
+      tags:
+        - Document
+      summary: "Récupére un Document par son ID"
+      description: "Accessible uniquement aux utilisateurs ayant un rôle 'Admin'"
+      operationId: "getDocumentById"
+      parameters:
+        - name: documentId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: "Document récupéré avec succès."
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/DocumentDto'
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NOTFOUND"
+        "500":
+          $ref: "#/components/responses/InternalError"
+      security:
+        - bearer-key: [ ]
+
+    put:
+      tags:
+        - Document
+      summary: "Met à jour un Document"
+      description: "Accessible uniquement aux utilisateurs ayant un rôle 'Admin'"
+      operationId: "updateDocumentById"
+      parameters:
+        - name: documentId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DocumentUpdateDto'
+      responses:
+        '200':
+          $ref: '#/components/responses/OK'
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NOTFOUND"
+        "500":
+          $ref: "#/components/responses/InternalError"
+      security:
+      - bearer-key: [ ]
+
+    delete:
+      tags:
+        - Document
+      summary: "Supprime une document"
+      operationId: "deleteDocument"
+      parameters:
+        - name: documentId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          $ref: '#/components/responses/OK'
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NOTFOUND"
+        "500":
+          $ref: "#/components/responses/InternalError"
+      security:
+        - bearer-key: [ ]
+
+components:
+  responses:
+    OK:
+      description: "Success"
+      content:
+        application/json:
+          schema:
+            type: "boolean"
+    BadRequest:
+      description: "Données en entrée invalide"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApiError"
+    Unauthorized:
+      description: "Unauthorized"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApiError"
+    Forbidden:
+      description: "Forbidden"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApiError"
+    NOTFOUND:
+      description: "Not found"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApiError"
+    InternalError:
+      description: "Internal Server Error"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApiError"
+    BadResponse:
+      description: "Erreur technique : mauvaise réponse serveur"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApiError"
+    Unavailable:
+      description: "service temporairement indisponible"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApiError"
+    Timeout:
+      description: "Erreur technique : temps de réponse serveur écoulé"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApiError"
+  schemas:
+    ApiError:
+      type: "object"
+      properties:
+        code:
+          type: "string"
+        label:
+          type: "string"
+
+    UtilisateurDto:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: "Identifiant unique de l'utilisateur"
+          example: 1
+        civilite:
+          type: string
+          description: "Civilité de l'utilisateur"
+          enum: [ M, MME ]
+          example: M
+        fullName:
+          type: string
+          maxLength: 200
+          description: "Nom complet de l'utilisateur (prénom + nom)"
+          example: "Jean Dupont"
+        email:
+          type: string
+          format: email
+          description: "Email de l'utilisateur"
+          example: "potter.harry@yopmail.com"
+        telephone:
+          type: string
+          description: "Numéro de téléphone de l'utilisateur"
+          example: "0836656565"
+        adresse:
+          type: string
+          description: "Adresse de l'utilisateur"
+          example: "4 Privet Drive"
+        codePostal:
+          type: string
+          description: "Code postal de l'utilisateur"
+          example: "75001"
+        ville:
+          type: string
+          description: "Ville de résidence de l'utilisateur"
+          example: "London"
+        pays:
+          type: string
+          description: "Pays de résidence de l'utilisateur"
+          example: "United Kingdom"
+        dateCreation:
+          type: string
+          format: date
+          description: "Date de création de l'utilisateur (lecture seule)"
+          example: "2020-10-01"
+        dateModification:
+          type: string
+          format: date
+          description: "Date de modification de l'utilisateur (lecture seule)"
+          example: "2020-10-01"
+        statutCompte:
+          type: string
+          description: "Statut du compte utilisateur"
+          example: "VALIDE"
+        role:
+          type: string
+          description: "Rôle de l'utilisateur"
+          example: "USER"
+
+    UtilisateurUpdateDto:
+      type: object
+      properties:
+        email:
+          type: string
+          description: "Adresse email (non modifiable)."
+        civilite:
+          type: string
+          enum:
+            - M
+            - MME
+          nullable: true
+          description: "Mise à jour de la civilité."
+        telephone:
+          type: string
+          nullable: true
+          description: "Nouveau numéro de téléphone."
+        adresse:
+          type: string
+          nullable: true
+          description: "Mise à jour de l'adresse."
+        code_postal:
+          type: string
+          nullable: true
+          description: "Mise à jour du code postal."
+        ville:
+          type: string
+          nullable: true
+          description: "Nouvelle ville."
+        pays:
+          type: string
+          nullable: true
+          description: "Nouveau pays."
+
+    UtilisateurPourRechercheDto:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: "Identifiant unique de l'utilisateur"
+          example: 1
+        civilite:
+          type: string
+          description: "Civilité de l'utilisateur"
+          enum: [ M, MME ]
+          example: "M"
+        nom:
+          type: string
+          description: "Nom de l'utilisateur"
+          example: "Potter"
+        prenom:
+          type: string
+          description: "Prénom de l'utilisateur"
+          example: "Harry"
+        email:
+          type: string
+          format: email
+          description: "Adresse email de l'utilisateur"
+          example: "potter.harry@yopmail.com"
+
+    AppartementDto:
+      type: "object"
+      properties:
+        id:
+          type: "integer"
+          format: "int64"
+          description: "Identifiant unique de l'appartement"
+          example: 1
+        utilisateur_id:
+          type: integer
+          format: int64
+          description: "Identifiant unique de l'utilisateur propriétaire de l'appartement."
+        adresse:
+          type: string
+          description: "Adresse de l'appartement"
+          example: "4 Privet Drive"
+        code_postal:
+          type: string
+          description: "Code postal de l'appartement"
+          example: "75001"
+        ville:
+          type: string
+          description: "Ville de l'appartement"
+          example: "London"
+        nombre_pieces:
+          type: integer
+          description: "Nombre de pièces dans l'appartement"
+          example: 4
+        surface:
+          type: number
+          format: decimal
+          description: "Surface totale de l'appartement en m²."
+        montant_loyer:
+          type: number
+          format: decimal
+          description: "Montant du loyer mensuel en euros."
+        montant_charge:
+          type: number
+          format: decimal
+          description: "Montant des charges associées en euros."
+        description:
+          type: string
+          nullable: true
+          description: "Description facultative de l'appartement."
+        deleted:
+          type: boolean
+          description: "Indique si l'appartement est supprimé logiquement (soft delete)."
+        date_creation:
+          type: string
+          format: date-time
+          description: "Date de création de l'appartement en base."
+        date_modification:
+          type: string
+          format: date-time
+          description: "Dernière date de mise à jour de l'appartement."
+
+    AppartementUpdateDto:
+      type: object
+      properties:
+        adresse:
+          type: string
+          nullable: true
+          description: "Nouvelle adresse de l'appartement, si modifiée."
+        code_postal:
+          type: string
+          nullable: true
+          description: "Mis à jour du code postal."
+        ville:
+          type: string
+          nullable: true
+          description: "Nouvelle ville."
+        nombre_pieces:
+          type: integer
+          nullable: true
+          description: "Nombre de pièces après modification."
+        surface:
+          type: number
+          format: decimal
+          nullable: true
+          description: "Nouvelle surface de l'appartement."
+        montant_loyer:
+          type: number
+          format: decimal
+          nullable: true
+          description: "Montant du loyer mis à jour."
+        montant_charge:
+          type: number
+          format: decimal
+          nullable: true
+          description: "Mise à jour des charges associées."
+        description:
+          type: string
+          nullable: true
+          description: "Mise à jour de la description."
+
+    AppartementPourRechercheDto:
+      type: "object"
+      properties:
+        id:
+          type: "integer"
+          format: "int64"
+          description: "Identifiant unique de l'appartement"
+          example: 1
+        utilisateur:
+          $ref: "#/components/schemas/UtilisateurPourRechercheDto"
+        adresse:
+          type: "string"
+          description: "Adresse de l'appartement"
+          example: "4 Privet Drive"
+        codePostal:
+          type: "string"
+          description: "Code postal de l'appartement"
+          example: "75001"
+        ville:
+          type: "string"
+          description: "Ville de l'appartement"
+          example: "London"
+        montantLoyer:
+          type: "integer"
+          description: "Montant du loyer mensuel"
+          example: 1200
+        montantCharge:
+          type: "integer"
+          description: "Montant mensuel des charges"
+          example: 100
+
+    LocataireDto:
+      type: object
+      properties:
+        id:
+          type: "integer"
+          format: "int64"
+          description: "L'ID unique du locataire"
+          example: 1
+        nom:
+          type: "string"
+          description: "Le nom du locataire"
+        prenom:
+          type: "string"
+          description: "Le prénom du locataire"
+        adresse:
+          type: "string"
+          description: "Adresse de l'appartement"
+          example: "4 Privet Drive"
+        codePostal:
+          type: "string"
+          description: "Code postal de l'appartement"
+          example: "75001"
+        ville:
+          type: "string"
+          description: "Ville de résidence de l'utilisateur"
+          example: "London"
+        email:
+          type: "string"
+          format: "email"
+          description: "Adresse email du locataire"
+          example: "potter.harry@yopmail.com"
+        telephone:
+          type: "string"
+          description: "Le telephone du locataire"
+          example: "+33 6 12 34 56 78"
+        dateCreation:
+          type: "string"
+          format: "date"
+          description: "Date de création du locataire"
+          example: "2020-10-01"
+        dateModification:
+          type: "string"
+          format: "date"
+          description: "Date de Modification du locataire"
+          example: "2020-10-01"
+
+    LocataireUpdateDto:
+      type: object
+      properties:
+        nom:
+          type: string
+          nullable: true
+          description: "Nom mis à jour du locataire."
+        prenom:
+          type: string
+          nullable: true
+          description: "Prénom mis à jour du locataire."
+        email:
+          type: string
+          nullable: true
+          description: "Nouvelle adresse email du locataire."
+        telephone:
+          type: string
+          nullable: true
+          description: "Téléphone mis à jour."
+        adresse:
+          type: string
+          nullable: true
+          description: "Nouvelle adresse de résidence."
+        code_postal:
+          type: string
+          nullable: true
+          description: "Mise à jour du code postal."
+        ville:
+          type: string
+          nullable: true
+          description: "Nouvelle ville."
+      description: "Les nouveaux champs modifiés pour un locataire."
+
+    LocatairesParUtilisateurDto:
+      type: object
+      properties:
+        id:
+          type: "integer"
+          format: "int64"
+          description: "Identifiant unique du locataire"
+          example: 1
+        nom:
+          type: "string"
+          description: "Nom du locataire"
+          example: "Granger"
+        prenom:
+          type: "string"
+          description: "Prénom du locataire"
+          example: "Hermione"
+        adresse:
+          type: "string"
+          description: "Adresse de résidence du locataire"
+          example: "5 Magnolia Crescent"
+        codePostal:
+          type: "string"
+          description: "Code postal"
+          example: "75002"
+        ville:
+          type: "string"
+          description: "Ville de résidence"
+          example: "Paris"
+        email:
+          type: "string"
+          format: "email"
+          description: "Adresse email du locataire"
+          example: "granger.hermione@yopmail.com"
+        telephone:
+          type: "string"
+          description: "Numéro de téléphone"
+          example: "+33 7 89 01 23 45"
+        appartement:
+          $ref: '#/components/schemas/AppartementPourRechercheDto'
+        dateDebut:
+          type: "string"
+          format: "date"
+          description: "Date de début de l'occupation du logement"
+          example: "2021-01-01"
+        dateFin:
+          type: "string"
+          format: "date"
+          nullable: true
+          description: "Date de fin d'occupation (si applicable)"
+          example: "2022-12-31"
+
+    OccupationDto:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: "Identifiant unique de l'occupation"
+          example: 1
+        appartement:
+          $ref: '#/components/schemas/AppartementPourRechercheDto'
+        locataire:
+          $ref: '#/components/schemas/LocataireRechercheOccupationDto'
+        dateDebut:
+          type: string
+          format: date
+          description: "Date de début de l'occupation"
+          example: "2020-11-01"
+        dateFin:
+          type: string
+          format: date
+          description: "Date de fin de l'occupation (si applicable)"
+          example: "2021-10-01"
+
+    OccupationCreationDto:
+      type: object
+      properties:
+        appartementId:
+          type: integer
+          description: "Identifiant de l'appartement"
+          example: 1
+        locataireId:
+          type: integer
+          description: "Identifiant du locataire"
+          example: 1
+        dateDebut:
+          type: string
+          format: date
+          description: "Date de début de l'occupation"
+          example: "2020-11-01"
+        dateFin:
+          type: string
+          format: date
+          description: "Date de fin de l'occupation (si applicable)"
+          example: null
+      required:
+        - appartementId
+        - locataireId
+        - dateDebut
+
+    LocataireRechercheOccupationDto:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: "Identifiant unique du locataire"
+          example: 1
+        nom:
+          type: string
+          description: "Nom du locataire"
+          example: "Potter"
+        prenom:
+          type: string
+          description: "Prénom du locataire"
+          example: "Harry"
+        email:
+          type: string
+          format: email
+          description: "Email du locataire"
+          example: "potter.harry@yopmail.com"
+        telephone:
+          type: string
+          description: "Téléphone du locataire"
+          example: "+33 6 12 34 56 78"
+
+    QuittanceDto:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: "Identifiant unique de la quittance"
+          example: 1
+        occupation:
+          $ref: '#/components/schemas/OccupationDto'
+        document_pdf:
+          $ref: '#/components/schemas/DocumentDto'
+        datePaiement:
+          type: string
+          format: date
+          description: "Date de paiement"
+          example: "2024-11-30"
+        moisQuittance:
+          type: string
+          pattern: "^[0-9]{4}-(0[1-9]|1[0-2])$"
+          description: "Mois et année de la quittance (au format YYYY-MM)"
+          example: "2024-10"
+        montantLoyer:
+          type: integer
+          description: "Montant du loyer"
+          example: 1200
+        montantCharge:
+          type: integer
+          description: "Montant des charges"
+          example: 100
+        ville:
+          type: string
+          description: "Ville"
+          example: "Rennes"
+        statut:
+          type: string
+          enum: [ EMISE, PAYEE, ANNULEE ]
+          description: "Statut de la quittance"
+          example: PAYEE
+        dateCreation:
+          type: string
+          format: date
+          description: "Date de création"
+          example: "2024-10-01"
+        dateModification:
+          type: string
+          format: date
+          description: "Date de modification"
+          example: "2024-10-10"
+
+    QuittanceUpdateDto:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: "Identifiant de la quittance"
+          example: 1
+        montantLoyer:
+          type: integer
+          description: "Montant du loyer mis à jour"
+          example: 1250
+        montantCharge:
+          type: integer
+          description: "Montant des charges mis à jour"
+          example: 110
+        ville:
+          type: string
+          description: "Ville mise à jour"
+          example: "Nantes"
+        datePaiement:
+          type: string
+          format: date
+          description: "Nouvelle date de paiement"
+          example: "2024-12-05"
+        statut:
+          type: string
+          enum: [ EMISE, PAYEE, ANNULEE ]
+          description: "Nouveau statut"
+          example: ANNULEE
+      required:
+        - id
+
+    QuittanceCreationDto:
+      type: object
+      properties:
+        occupationId:
+          type: integer
+          description: "Identifiant de l'occupation"
+          example: 42
+        montantLoyer:
+          type: integer
+          description: "Montant du loyer"
+          example: 1200
+        montantCharge:
+          type: integer
+          description: "Montant des charges"
+          example: 100
+        ville:
+          type: string
+          description: "Ville de la quittance"
+          example: "Rennes"
+        datePaiement:
+          type: string
+          format: date
+          description: "Date de paiement"
+          example: "2024-11-30"
+        moisQuittance:
+          type: string
+          pattern: "^[0-9]{4}-(0[1-9]|1[0-2])$"
+          description: "Mois et année (format YYYY-MM)"
+          example: "2024-10"
+        statut:
+          type: string
+          enum: [ EMISE, PAYEE, ANNULEE ]
+          description: "Statut de la quittance"
+          example: PAYEE
+      required:
+        - occupationId
+        - ville
+        - moisQuittance
+        - statut
+
+    DocumentDto:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: "Identifiant unique du document"
+          example: 1
+        utilisateurPourDocumentDto:
+          $ref: '#/components/schemas/UtilisateurPourDocumentDto'
+        nomFichier:
+          type: string
+          description: "Nom du fichier PDF"
+          example: "quittance_octobre_2024.pdf"
+        cheminFichier:
+          type: string
+          description: "Chemin de stockage du fichier"
+          example: "/documents/2024/quittance_octobre_2024.pdf"
+        dateCreation:
+          type: string
+          format: date
+          description: "Date de création du document"
+          example: "2024-10-01"
+        dateModification:
+          type: string
+          format: date
+          description: "Date de dernière modification"
+          example: "2024-10-10"
+
+    DocumentUpdateDto:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: "Identifiant du document"
+          example: 1
+        utilisateurId:
+          type: integer
+          description: "Identifiant de l'utilisateur"
+          example: 123
+        nomFichier:
+          type: string
+          description: "Nom du fichier"
+          example: "quittance_octobre_2024.pdf"
+        cheminFichier:
+          type: string
+          description: "Chemin du fichier"
+          example: "/documents/2024/quittance_octobre_2024.pdf"
+        dateCreation:
+          type: string
+          format: date
+          description: "Date de création"
+          example: "2024-10-01"
+        dateModification:
+          type: string
+          format: date
+          description: "Date de modification"
+          example: "2024-10-10"
+      required:
+        - id
+
+    UtilisateurPourDocumentDto:
+      type: object
+      description: "Informations de l'utilisateur associé au document"
+      properties:
+        id:
+          type: integer
+          description: "Identifiant de l'utilisateur"
+          example: 123
+        nom:
+          type: string
+          description: "Nom de l'utilisateur"
+          example: "Dupont"
+        email:
+          type: string
+          format: email
+          description: "Email de l'utilisateur"
+          example: "dupont@example.com"
+
+    ErrorResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 400
+          description: "Code HTTP de l'erreur"
+        status:
+          type: string
+          example: "BAD_REQUEST"
+          description: "Nom symbolique de l'erreur"
+        message:
+          type: string
+          example: "Le champ email est obligatoire."
+          description: "Message détaillé de l'erreur"
+  securitySchemes:
+    bearer-key:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
