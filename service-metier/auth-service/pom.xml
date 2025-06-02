@@ -10,9 +10,14 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>quittance-service</artifactId>
+    <artifactId>auth-service</artifactId>
 
     <dependencies>
+        <!-- Spring Boot Security -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -40,16 +45,25 @@
             <artifactId>spring-cloud-starter-config</artifactId>
         </dependency>
 
+        <!-- Token Management avec JWT -->
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-impl</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-jackson</artifactId>
+        </dependency>
+
+        <!-- Accès aux données avec JPA -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-        </dependency>
-
-        <!-- Dépendances pour la base de données -->
         <dependency>
             <groupId>org.mariadb.jdbc</groupId>
             <artifactId>mariadb-java-client</artifactId>
@@ -98,12 +112,6 @@
             <version>1.5.5.Final</version>
         </dependency>
 
-        <dependency>
-            <groupId>org.springdoc</groupId>
-            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-            <version>2.0.4</version>
-        </dependency>
-
         <!-- Dépendances JAXB pour le support XML -->
         <dependency>
             <groupId>jakarta.xml.bind</groupId>
@@ -121,49 +129,24 @@
             <version>4.0.0</version>
         </dependency>
 
-        <!-- Dépendance pour JUnit 5 -->
+        <!-- Lombok -->
         <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-api</artifactId>
-            <version>5.10.2</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-engine</artifactId>
-            <version>5.10.2</version>
-            <scope>test</scope>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <scope>provided</scope>
         </dependency>
 
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-webflux</artifactId>
-            <version>6.1.14</version>
-        </dependency>
-
-        <!-- Dépendance pour les PDF -->
-        <dependency>
-            <groupId>com.itextpdf</groupId>
-            <artifactId>itextpdf</artifactId>
-            <version>5.5.13.3</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.pdfbox</groupId>
-            <artifactId>pdfbox</artifactId>
-            <version>3.0.3</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.ibm.icu</groupId>
-            <artifactId>icu4j</artifactId>
-            <version>76.1</version>
-        </dependency>
-
+        <!-- Tests -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-actuator</artifactId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
         </dependency>
-
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-test</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -187,13 +170,13 @@
                 <configuration>
                     <source>17</source>
                     <target>17</target>
-
                 </configuration>
             </plugin>
 
             <plugin>
                 <groupId>org.openapitools</groupId>
                 <artifactId>openapi-generator-maven-plugin</artifactId>
+
                 <configuration>
                     <typeMappings>
                         <typeMapping>OffsetDateTime=java.time.LocalDateTime</typeMapping>
@@ -222,23 +205,21 @@
 
                 <executions>
                     <execution>
-                        <id>api-gestion-quittance</id>
+                        <id>api-auth-service</id>
                         <goals>
                             <goal>generate</goal>
                         </goals>
                         <configuration>
-                            <inputSpec>${project.basedir}/../../open-api/gestion-quittances-api.yaml</inputSpec>
-                            <apiPackage>fr.quittance.service.application.controller</apiPackage>
-                            <modelPackage>fr.quittance.service.domain.model</modelPackage>
-                            <invokerPackage>fr.quittance.service.application</invokerPackage>
-                            <packageName>fr.quittance.service</packageName>
+                            <inputSpec>${project.basedir}/../../open-api/auth-service-api.yaml</inputSpec>
+                            <apiPackage>fr.authservice.application.controller</apiPackage>
+                            <modelPackage>fr.authservice.domain.model</modelPackage>
+                            <invokerPackage>fr.authservice.application</invokerPackage>
+                            <packageName>fr.authservice</packageName>
                         </configuration>
-
                     </execution>
                 </executions>
             </plugin>
         </plugins>
     </build>
-
 
 </project>

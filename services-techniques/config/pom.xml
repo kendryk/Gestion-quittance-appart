@@ -10,7 +10,6 @@
     </parent>
 
     <artifactId>config</artifactId>
-    <version>1.0-SNAPSHOT</version>
     <name>config</name>
     <description>Serveur de configuration centralisé</description>
 

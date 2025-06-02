@@ -1,6 +1,6 @@
 spring:
   application:
-    name: quittance-service
+    name: auth-service
   profiles:
     active: dev
   config:
@@ -15,7 +15,7 @@ spring:
 
 # Fallback si Config Server est indisponible
 server:
-  port: 8080
+  port: 8081
 
 logging:
   level:

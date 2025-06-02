@@ -4,7 +4,7 @@ info:
   version: "1.0.0"
   description: "Api pour la gestion des quittances de loyer, des utilisateurs, des appartements"
 servers:
-  - url: '/api/gestion-acces'
+  - url: '/api/gestionquittances'
 tags:
   - name: "Utilisateur"
     description: "Gestion des utilisateurs"
@@ -20,207 +20,207 @@ tags:
     description: "Gestion des Documents"
 
 paths:
-  /utilisateurs:
-    get:
-      tags:
-        - Utilisateur
-      summary: "Récupère la liste de tous les utilisateurs"
-      description: "Accessible uniquement aux utilisateurs ayant un rôle 'Admin'"
-      operationId: "getUtilisateurs"
-      responses:
-        "200":
-          description: "Liste des utilisateurs récupérée avec succès."
-          content:
-            application/json:
-              schema:
-                type: "array"
-                items:
-                  $ref: "#/components/schemas/UtilisateurDto"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "403":
-          $ref: "#/components/responses/Forbidden"
-        "404":
-          $ref: "#/components/responses/NOTFOUND"
-        "500":
-          $ref: "#/components/responses/InternalError"
-      security:
-        - bearer-key: []
-
-    post:
-      tags:
-        - Utilisateur
-      summary: "Créer un nouvel utilisateur."
-      operationId: "creeUtilisateur"
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/UtilisateurDto'
-      responses:
-        "201":
-          description: "Compte utilisateur créé avec succès."
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  id:
-                    type: integer
-                    description: "Identifiant unique généré pour l'utilisateur."
-                  message:
-                    type: string
-                    example: "Utilisateur créé avec succès."
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "403":
-          $ref: "#/components/responses/Forbidden"
-        "404":
-          $ref: "#/components/responses/NOTFOUND"
-        "500":
-          $ref: "#/components/responses/InternalError"
-      security:
-        - bearer-key: []
-
-  /utilisateurs/{utilisateurId}:
-    get:
-      tags:
-        - Utilisateur
-      summary: "Récupére un utilisateur par son ID"
-      description: "Accessible uniquement aux utilisateurs ayant un rôle 'Admin'"
-      operationId: "getUtilisateurById"
-      parameters:
-        - name: utilisateurId
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
-      responses:
-        '200':
-          description: "Utilisateur récupéré avec succès."
-          content:
-            'application/json':
-              schema:
-                $ref: '#/components/schemas/UtilisateurDto'
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "403":
-          $ref: "#/components/responses/Forbidden"
-        "404":
-          $ref: "#/components/responses/NOTFOUND"
-        "500":
-          $ref: "#/components/responses/InternalError"
-      security:
-        - bearer-key: [ ]
-
-    put:
-      tags:
-        - Utilisateur
-      summary: "Mettre à jour un utilisateur."
-      description: "Accessible uniquement aux utilisateurs ayant un rôle 'Admin'"
-      operationId: "updateUtilisateurById"
-      parameters:
-        - name: utilisateurId
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/UtilisateurUpdateDto'
-      responses:
-        '200':
-          description: "Mise à jour réussie."
-          $ref: "#/components/responses/OK"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "403":
-          $ref: "#/components/responses/Forbidden"
-        "404":
-          $ref: "#/components/responses/NOTFOUND"
-        "500":
-          $ref: "#/components/responses/InternalError"
-      security:
-        - bearer-key: [ ]
-
-    patch:
-      tags:
-        - Utilisateur
-      summary: "Marquer un utilisateur comme supprimé (soft delete)"
-      description: "L'utilisateur n'est pas physiquement supprimé de la base de données mais son statut est mis à jour."
-      operationId: "softDeleteUtilisateur"
-      parameters:
-        - name: utilisateurId
-          in: path
-          required: true
-          schema:
-            type: string
-            description: L'identifant du compte à modifier
-            example: john.doe@test.com
-      responses:
-        200:
-          $ref: '#/components/responses/OK'
-        400:
-          $ref: '#/components/responses/BadRequest'
-        401:
-          $ref: '#/components/responses/Unauthorized'
-        403:
-          $ref: '#/components/responses/Forbidden'
-        404:
-          $ref: '#/components/responses/NOTFOUND'
-        500:
-          $ref: '#/components/responses/InternalError'
-      security:
-        - bearer-key: []
-
-  /utilisateurs/{utilisateurId}/locataires:
-    get:
-      tags:
-        - Utilisateur
-      summary: "Liste des locataires par utilisateur"
-      operationId: "getLocatairesByUtilisateurId"
-      parameters:
-        - name: utilisateurId
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
-      responses:
-        '200':
-          description: "Liste récupérée avec succès."
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/LocatairesParUtilisateurDto'
-        400:
-          $ref: '#/components/responses/BadRequest'
-        401:
-          $ref: '#/components/responses/Unauthorized'
-        403:
-          $ref: '#/components/responses/Forbidden'
-        404:
-          $ref: '#/components/responses/NOTFOUND'
-        500:
-          $ref: '#/components/responses/InternalError'
-      security:
-        - bearer-key: [ ]
+#  /utilisateurs:
+#    get:
+#      tags:
+#        - Utilisateur
+#      summary: "Récupère la liste de tous les utilisateurs"
+#      description: "Accessible uniquement aux utilisateurs ayant un rôle 'Admin'"
+#      operationId: "getUtilisateurs"
+#      responses:
+#        "200":
+#          description: "Liste des utilisateurs récupérée avec succès."
+#          content:
+#            application/json:
+#              schema:
+#                type: "array"
+#                items:
+#                  $ref: "#/components/schemas/UtilisateurDto"
+#        "400":
+#          $ref: "#/components/responses/BadRequest"
+#        "401":
+#          $ref: "#/components/responses/Unauthorized"
+#        "403":
+#          $ref: "#/components/responses/Forbidden"
+#        "404":
+#          $ref: "#/components/responses/NOTFOUND"
+#        "500":
+#          $ref: "#/components/responses/InternalError"
+#      security:
+#        - bearer-key: []
+#
+#    post:
+#      tags:
+#        - Utilisateur
+#      summary: "Créer un nouvel utilisateur."
+#      operationId: "creeUtilisateur"
+#      requestBody:
+#        required: true
+#        content:
+#          application/json:
+#            schema:
+#              $ref: '#/components/schemas/UtilisateurDto'
+#      responses:
+#        "201":
+#          description: "Compte utilisateur créé avec succès."
+#          content:
+#            application/json:
+#              schema:
+#                type: object
+#                properties:
+#                  id:
+#                    type: integer
+#                    description: "Identifiant unique généré pour l'utilisateur."
+#                  message:
+#                    type: string
+#                    example: "Utilisateur créé avec succès."
+#        "400":
+#          $ref: "#/components/responses/BadRequest"
+#        "401":
+#          $ref: "#/components/responses/Unauthorized"
+#        "403":
+#          $ref: "#/components/responses/Forbidden"
+#        "404":
+#          $ref: "#/components/responses/NOTFOUND"
+#        "500":
+#          $ref: "#/components/responses/InternalError"
+#      security:
+#        - bearer-key: []
+#
+#  /utilisateurs/{utilisateurId}:
+#    get:
+#      tags:
+#        - Utilisateur
+#      summary: "Récupére un utilisateur par son ID"
+#      description: "Accessible uniquement aux utilisateurs ayant un rôle 'Admin'"
+#      operationId: "getUtilisateurById"
+#      parameters:
+#        - name: utilisateurId
+#          in: path
+#          required: true
+#          schema:
+#            type: integer
+#            format: int64
+#      responses:
+#        '200':
+#          description: "Utilisateur récupéré avec succès."
+#          content:
+#            'application/json':
+#              schema:
+#                $ref: '#/components/schemas/UtilisateurDto'
+#        "400":
+#          $ref: "#/components/responses/BadRequest"
+#        "401":
+#          $ref: "#/components/responses/Unauthorized"
+#        "403":
+#          $ref: "#/components/responses/Forbidden"
+#        "404":
+#          $ref: "#/components/responses/NOTFOUND"
+#        "500":
+#          $ref: "#/components/responses/InternalError"
+#      security:
+#        - bearer-key: [ ]
+#
+#    put:
+#      tags:
+#        - Utilisateur
+#      summary: "Mettre à jour un utilisateur."
+#      description: "Accessible uniquement aux utilisateurs ayant un rôle 'Admin'"
+#      operationId: "updateUtilisateurById"
+#      parameters:
+#        - name: utilisateurId
+#          in: path
+#          required: true
+#          schema:
+#            type: integer
+#            format: int64
+#      requestBody:
+#        required: true
+#        content:
+#          application/json:
+#            schema:
+#              $ref: '#/components/schemas/UtilisateurUpdateDto'
+#      responses:
+#        '200':
+#          description: "Mise à jour réussie."
+#          $ref: "#/components/responses/OK"
+#        "400":
+#          $ref: "#/components/responses/BadRequest"
+#        "401":
+#          $ref: "#/components/responses/Unauthorized"
+#        "403":
+#          $ref: "#/components/responses/Forbidden"
+#        "404":
+#          $ref: "#/components/responses/NOTFOUND"
+#        "500":
+#          $ref: "#/components/responses/InternalError"
+#      security:
+#        - bearer-key: [ ]
+#
+#    patch:
+#      tags:
+#        - Utilisateur
+#      summary: "Marquer un utilisateur comme supprimé (soft delete)"
+#      description: "L'utilisateur n'est pas physiquement supprimé de la base de données mais son statut est mis à jour."
+#      operationId: "softDeleteUtilisateur"
+#      parameters:
+#        - name: utilisateurId
+#          in: path
+#          required: true
+#          schema:
+#            type: string
+#            description: L'identifant du compte à modifier
+#            example: john.doe@test.com
+#      responses:
+#        200:
+#          $ref: '#/components/responses/OK'
+#        400:
+#          $ref: '#/components/responses/BadRequest'
+#        401:
+#          $ref: '#/components/responses/Unauthorized'
+#        403:
+#          $ref: '#/components/responses/Forbidden'
+#        404:
+#          $ref: '#/components/responses/NOTFOUND'
+#        500:
+#          $ref: '#/components/responses/InternalError'
+#      security:
+#        - bearer-key: []
+#
+#  /utilisateurs/{utilisateurId}/locataires:
+#    get:
+#      tags:
+#        - Utilisateur
+#      summary: "Liste des locataires par utilisateur"
+#      operationId: "getLocatairesByUtilisateurId"
+#      parameters:
+#        - name: utilisateurId
+#          in: path
+#          required: true
+#          schema:
+#            type: integer
+#            format: int64
+#      responses:
+#        '200':
+#          description: "Liste récupérée avec succès."
+#          content:
+#            application/json:
+#              schema:
+#                type: array
+#                items:
+#                  $ref: '#/components/schemas/LocatairesParUtilisateurDto'
+#        400:
+#          $ref: '#/components/responses/BadRequest'
+#        401:
+#          $ref: '#/components/responses/Unauthorized'
+#        403:
+#          $ref: '#/components/responses/Forbidden'
+#        404:
+#          $ref: '#/components/responses/NOTFOUND'
+#        500:
+#          $ref: '#/components/responses/InternalError'
+#      security:
+#        - bearer-key: [ ]
 
   /gestionappartement/appartements:
     get:
@@ -338,38 +338,38 @@ paths:
       security:
         - bearer-key: [ ]
 
-  /gestionappartement/appartements/{appartementId}/gestionnaire:
-    get:
-      tags:
-        - Gestionnaire appartement
-      summary: "Récupère le gestionnaire associé à un appartement"
-      operationId: "getGestionnaireByAppartement"
-      parameters:
-        - name: appartementId
-          in: path
-          required: true
-          schema:
-            type: string
-            description: "Identifiant unique de l'appartement"
-      responses:
-        '200':
-          description: "Gestionnaire récupéré avec succès."
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UtilisateurDto'
-        400:
-          $ref: '#/components/responses/BadRequest'
-        401:
-          $ref: '#/components/responses/Unauthorized'
-        403:
-          $ref: '#/components/responses/Forbidden'
-        404:
-          $ref: '#/components/responses/NOTFOUND'
-        500:
-          $ref: '#/components/responses/InternalError'
-      security:
-        - bearer-key: [ ]
+#  /gestionappartement/appartements/{appartementId}/gestionnaire:
+#    get:
+#      tags:
+#        - Gestionnaire appartement
+#      summary: "Récupère le gestionnaire associé à un appartement"
+#      operationId: "getGestionnaireByAppartement"
+#      parameters:
+#        - name: appartementId
+#          in: path
+#          required: true
+#          schema:
+#            type: string
+#            description: "Identifiant unique de l'appartement"
+#      responses:
+#        '200':
+#          description: "Gestionnaire récupéré avec succès."
+#          content:
+#            application/json:
+#              schema:
+#                $ref: '#/components/schemas/UtilisateurDto'
+#        400:
+#          $ref: '#/components/responses/BadRequest'
+#        401:
+#          $ref: '#/components/responses/Unauthorized'
+#        403:
+#          $ref: '#/components/responses/Forbidden'
+#        404:
+#          $ref: '#/components/responses/NOTFOUND'
+#        500:
+#          $ref: '#/components/responses/InternalError'
+#      security:
+#        - bearer-key: [ ]
 
   /gestionappartement/appartements/{appartementId}:
     get:
@@ -1205,101 +1205,101 @@ components:
         label:
           type: "string"
 
-    UtilisateurDto:
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int64
-          description: "Identifiant unique de l'utilisateur"
-          example: 1
-        civilite:
-          type: string
-          description: "Civilité de l'utilisateur"
-          enum: [ M, MME ]
-          example: M
-        fullName:
-          type: string
-          maxLength: 200
-          description: "Nom complet de l'utilisateur (prénom + nom)"
-          example: "Jean Dupont"
-        email:
-          type: string
-          format: email
-          description: "Email de l'utilisateur"
-          example: "potter.harry@yopmail.com"
-        telephone:
-          type: string
-          description: "Numéro de téléphone de l'utilisateur"
-          example: "0836656565"
-        adresse:
-          type: string
-          description: "Adresse de l'utilisateur"
-          example: "4 Privet Drive"
-        codePostal:
-          type: string
-          description: "Code postal de l'utilisateur"
-          example: "75001"
-        ville:
-          type: string
-          description: "Ville de résidence de l'utilisateur"
-          example: "London"
-        pays:
-          type: string
-          description: "Pays de résidence de l'utilisateur"
-          example: "United Kingdom"
-        dateCreation:
-          type: string
-          format: date
-          description: "Date de création de l'utilisateur (lecture seule)"
-          example: "2020-10-01"
-        dateModification:
-          type: string
-          format: date
-          description: "Date de modification de l'utilisateur (lecture seule)"
-          example: "2020-10-01"
-        statutCompte:
-          type: string
-          description: "Statut du compte utilisateur"
-          example: "VALIDE"
-        role:
-          type: string
-          description: "Rôle de l'utilisateur"
-          example: "USER"
-
-    UtilisateurUpdateDto:
-      type: object
-      properties:
-        email:
-          type: string
-          description: "Adresse email (non modifiable)."
-        civilite:
-          type: string
-          enum:
-            - M
-            - MME
-          nullable: true
-          description: "Mise à jour de la civilité."
-        telephone:
-          type: string
-          nullable: true
-          description: "Nouveau numéro de téléphone."
-        adresse:
-          type: string
-          nullable: true
-          description: "Mise à jour de l'adresse."
-        code_postal:
-          type: string
-          nullable: true
-          description: "Mise à jour du code postal."
-        ville:
-          type: string
-          nullable: true
-          description: "Nouvelle ville."
-        pays:
-          type: string
-          nullable: true
-          description: "Nouveau pays."
+#    UtilisateurDto:
+#      type: object
+#      properties:
+#        id:
+#          type: integer
+#          format: int64
+#          description: "Identifiant unique de l'utilisateur"
+#          example: 1
+#        civilite:
+#          type: string
+#          description: "Civilité de l'utilisateur"
+#          enum: [ M, MME ]
+#          example: M
+#        fullName:
+#          type: string
+#          maxLength: 200
+#          description: "Nom complet de l'utilisateur (prénom + nom)"
+#          example: "Jean Dupont"
+#        email:
+#          type: string
+#          format: email
+#          description: "Email de l'utilisateur"
+#          example: "potter.harry@yopmail.com"
+#        telephone:
+#          type: string
+#          description: "Numéro de téléphone de l'utilisateur"
+#          example: "0836656565"
+#        adresse:
+#          type: string
+#          description: "Adresse de l'utilisateur"
+#          example: "4 Privet Drive"
+#        codePostal:
+#          type: string
+#          description: "Code postal de l'utilisateur"
+#          example: "75001"
+#        ville:
+#          type: string
+#          description: "Ville de résidence de l'utilisateur"
+#          example: "London"
+#        pays:
+#          type: string
+#          description: "Pays de résidence de l'utilisateur"
+#          example: "United Kingdom"
+#        dateCreation:
+#          type: string
+#          format: date
+#          description: "Date de création de l'utilisateur (lecture seule)"
+#          example: "2020-10-01"
+#        dateModification:
+#          type: string
+#          format: date
+#          description: "Date de modification de l'utilisateur (lecture seule)"
+#          example: "2020-10-01"
+#        statutCompte:
+#          type: string
+#          description: "Statut du compte utilisateur"
+#          example: "VALIDE"
+#        role:
+#          type: string
+#          description: "Rôle de l'utilisateur"
+#          example: "USER"
+#
+#    UtilisateurUpdateDto:
+#      type: object
+#      properties:
+#        email:
+#          type: string
+#          description: "Adresse email (non modifiable)."
+#        civilite:
+#          type: string
+#          enum:
+#            - M
+#            - MME
+#          nullable: true
+#          description: "Mise à jour de la civilité."
+#        telephone:
+#          type: string
+#          nullable: true
+#          description: "Nouveau numéro de téléphone."
+#        adresse:
+#          type: string
+#          nullable: true
+#          description: "Mise à jour de l'adresse."
+#        code_postal:
+#          type: string
+#          nullable: true
+#          description: "Mise à jour du code postal."
+#        ville:
+#          type: string
+#          nullable: true
+#          description: "Nouvelle ville."
+#        pays:
+#          type: string
+#          nullable: true
+#          description: "Nouveau pays."
 
     UtilisateurPourRechercheDto:
       type: object
@@ -1877,6 +1877,7 @@ components:
           type: string
           example: "Le champ email est obligatoire."
           description: "Message détaillé de l'erreur"
+
   securitySchemes:
     bearer-key:
       type: http

@@ -1,0 +1,452 @@
+openapi: "3.0.0"
+info:
+  title: "API d'Authentification"
+  version: "1.0.0"
+  description: "API pour gérer le login, 2FA et tokens JWT."
+
+servers:
+  - url: '/api/auth'
+
+tags:
+  - name: "Utilisateur"
+    description: "Gestion des utilisateurs"
+
+paths:
+  /login:
+    post:
+      summary: Login utilisateur
+      description: Permet à un utilisateur de s'authentifier
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Succès
+          content:
+            application/json:
+              schema:
+                type: string
+        '401':
+          description: Identifiants invalides
+
+  /verify-2fa:
+    post:
+      summary: Vérification 2FA
+      description: Permet de vérifier un code 2FA et de générer un token.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                code2fa:
+                  type: string
+      responses:
+        '200':
+          description: Succès
+          content:
+            application/json:
+              schema:
+                type: string
+        '401':
+          description: Code invalide
+
+
+  /utilisateurs:
+    get:
+      tags:
+        - Utilisateur
+      summary: "Récupère la liste de tous les utilisateurs"
+      description: "Accessible uniquement aux utilisateurs ayant un rôle 'Admin'"
+      operationId: "getUtilisateurs"
+      responses:
+        "200":
+          description: "Liste des utilisateurs récupérée avec succès."
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/UtilisateurDto"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NOTFOUND"
+        "500":
+          $ref: "#/components/responses/InternalError"
+      security:
+        - bearer-key: []
+
+    post:
+      tags:
+        - Utilisateur
+      summary: "Créer un nouvel utilisateur."
+      operationId: "creeUtilisateur"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UtilisateurDto'
+      responses:
+        "201":
+          description: "Compte utilisateur créé avec succès."
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    description: "Identifiant unique généré pour l'utilisateur."
+                  message:
+                    type: string
+                    example: "Utilisateur créé avec succès."
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NOTFOUND"
+        "500":
+          $ref: "#/components/responses/InternalError"
+      security:
+        - bearer-key: []
+
+  /utilisateurs/{utilisateurId}:
+    get:
+      tags:
+        - Utilisateur
+      summary: "Récupére un utilisateur par son ID"
+      description: "Accessible uniquement aux utilisateurs ayant un rôle 'Admin'"
+      operationId: "getUtilisateurById"
+      parameters:
+        - name: utilisateurId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: "Utilisateur récupéré avec succès."
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/UtilisateurDto'
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NOTFOUND"
+        "500":
+          $ref: "#/components/responses/InternalError"
+      security:
+        - bearer-key: [ ]
+
+    put:
+      tags:
+        - Utilisateur
+      summary: "Mettre à jour un utilisateur."
+      description: "Accessible uniquement aux utilisateurs ayant un rôle 'Admin'"
+      operationId: "updateUtilisateurById"
+      parameters:
+        - name: utilisateurId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UtilisateurUpdateDto'
+      responses:
+        '200':
+          description: "Mise à jour réussie."
+          $ref: "#/components/responses/OK"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NOTFOUND"
+        "500":
+          $ref: "#/components/responses/InternalError"
+      security:
+        - bearer-key: [ ]
+
+    patch:
+      tags:
+        - Utilisateur
+      summary: "Marquer un utilisateur comme supprimé (soft delete)"
+      description: "L'utilisateur n'est pas physiquement supprimé de la base de données mais son statut est mis à jour."
+      operationId: "softDeleteUtilisateur"
+      parameters:
+        - name: utilisateurId
+          in: path
+          required: true
+          schema:
+            type: string
+            description: L'identifant du compte à modifier
+            example: john.doe@test.com
+      responses:
+        200:
+          $ref: '#/components/responses/OK'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        403:
+          $ref: '#/components/responses/Forbidden'
+        404:
+          $ref: '#/components/responses/NOTFOUND'
+        500:
+          $ref: '#/components/responses/InternalError'
+      security:
+        - bearer-key: []
+
+components:
+  responses:
+    OK:
+      description: "Success"
+      content:
+        application/json:
+          schema:
+            type: "boolean"
+    BadRequest:
+      description: "Données en entrée invalide"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApiError"
+    Unauthorized:
+      description: "Unauthorized"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApiError"
+    Forbidden:
+      description: "Forbidden"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApiError"
+    NOTFOUND:
+      description: "Not found"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApiError"
+    InternalError:
+      description: "Internal Server Error"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApiError"
+    BadResponse:
+      description: "Erreur technique : mauvaise réponse serveur"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApiError"
+    Unavailable:
+      description: "service temporairement indisponible"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApiError"
+    Timeout:
+      description: "Erreur technique : temps de réponse serveur écoulé"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApiError"
+  schemas:
+    ApiError:
+      type: "object"
+      properties:
+        code:
+          type: "string"
+        label:
+          type: "string"
+
+    UtilisateurDto:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: "Identifiant unique de l'utilisateur"
+          example: 1
+        civilite:
+          type: string
+          description: "Civilité de l'utilisateur"
+          enum: [ M, MME ]
+          example: M
+        fullName:
+          type: string
+          maxLength: 200
+          description: "Nom complet de l'utilisateur (prénom + nom)"
+          example: "Jean Dupont"
+        email:
+          type: string
+          format: email
+          description: "Email de l'utilisateur"
+          example: "potter.harry@yopmail.com"
+        telephone:
+          type: string
+          description: "Numéro de téléphone de l'utilisateur"
+          example: "0836656565"
+        adresse:
+          type: string
+          description: "Adresse de l'utilisateur"
+          example: "4 Privet Drive"
+        codePostal:
+          type: string
+          description: "Code postal de l'utilisateur"
+          example: "75001"
+        ville:
+          type: string
+          description: "Ville de résidence de l'utilisateur"
+          example: "London"
+        pays:
+          type: string
+          description: "Pays de résidence de l'utilisateur"
+          example: "United Kingdom"
+        dateCreation:
+          type: string
+          format: date
+          description: "Date de création de l'utilisateur (lecture seule)"
+          example: "2020-10-01"
+        dateModification:
+          type: string
+          format: date
+          description: "Date de modification de l'utilisateur (lecture seule)"
+          example: "2020-10-01"
+        statutCompte:
+          type: string
+          description: "Statut du compte utilisateur"
+          example: "VALIDE"
+        role:
+          type: string
+          description: "Rôle de l'utilisateur"
+          example: "USER"
+
+    UtilisateurUpdateDto:
+      type: object
+      properties:
+        email:
+          type: string
+          description: "Adresse email (non modifiable)."
+        civilite:
+          type: string
+          enum:
+            - M
+            - MME
+          nullable: true
+          description: "Mise à jour de la civilité."
+        telephone:
+          type: string
+          nullable: true
+          description: "Nouveau numéro de téléphone."
+        adresse:
+          type: string
+          nullable: true
+          description: "Mise à jour de l'adresse."
+        code_postal:
+          type: string
+          nullable: true
+          description: "Mise à jour du code postal."
+        ville:
+          type: string
+          nullable: true
+          description: "Nouvelle ville."
+        pays:
+          type: string
+          nullable: true
+          description: "Nouveau pays."
+
+    UtilisateurPourRechercheDto:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: "Identifiant unique de l'utilisateur"
+          example: 1
+        civilite:
+          type: string
+          description: "Civilité de l'utilisateur"
+          enum: [ M, MME ]
+          example: "M"
+        nom:
+          type: string
+          description: "Nom de l'utilisateur"
+          example: "Potter"
+        prenom:
+          type: string
+          description: "Prénom de l'utilisateur"
+          example: "Harry"
+        email:
+          type: string
+          format: email
+          description: "Adresse email de l'utilisateur"
+          example: "potter.harry@yopmail.com"
+
+    ErrorResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 400
+          description: "Code HTTP de l'erreur"
+        status:
+          type: string
+          example: "BAD_REQUEST"
+          description: "Nom symbolique de l'erreur"
+        message:
+          type: string
+          example: "Le champ email est obligatoire."
+          description: "Message détaillé de l'erreur"
+
+  securitySchemes:
+    bearer-key:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+
+
+
+
+
+
+
+
+
+
