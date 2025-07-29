@@ -15,6 +15,8 @@ import java.sql.Timestamp;
 public class Utilisateur {
     private Long id;
     private String email;
+    private String password;
+    private Boolean deleted;
     private CiviliteEnum civilite;
     private String nom;
     private String prenom;

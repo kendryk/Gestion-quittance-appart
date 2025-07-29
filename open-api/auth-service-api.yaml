@@ -5,7 +5,7 @@ info:
   description: "API pour gérer le login, 2FA et tokens JWT."
 
 servers:
-  - url: '/api/auth'
+  - url: '/auth'
 
 tags:
   - name: "Utilisateur"
@@ -23,7 +23,7 @@ paths:
             schema:
               type: object
               properties:
-                username:
+                identifiantUtilisateur:
                   type: string
                 password:
                   type: string
@@ -48,7 +48,7 @@ paths:
             schema:
               type: object
               properties:
-                username:
+                identifiantUtilisateur:
                   type: string
                 code2fa:
                   type: string
@@ -58,10 +58,53 @@ paths:
           content:
             application/json:
               schema:
-                type: string
+                type: object
+                properties:
+                  token:
+                    type: string
+                    description: Le token JWT à utiliser dans l’en-tête Authorization
+                  status:
+                    type: string
+                    example: success
         '401':
           description: Code invalide
 
+  /register:
+    post:
+      tags:
+        - Utilisateur
+      summary: "Créer un nouvel utilisateur."
+      operationId: "creeUtilisateur"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UtilisateurCreationDto'
+      responses:
+        "201":
+          description: "Compte utilisateur créé avec succès."
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    description: "Identifiant unique généré pour l'utilisateur."
+                  message:
+                    type: string
+                    example: "Utilisateur créé avec succès."
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NOTFOUND"
+        "500":
+          $ref: "#/components/responses/InternalError"
 
   /utilisateurs:
     get:
@@ -92,43 +135,43 @@ paths:
       security:
         - bearer-key: []
 
-    post:
-      tags:
-        - Utilisateur
-      summary: "Créer un nouvel utilisateur."
-      operationId: "creeUtilisateur"
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/UtilisateurDto'
-      responses:
-        "201":
-          description: "Compte utilisateur créé avec succès."
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  id:
-                    type: integer
-                    description: "Identifiant unique généré pour l'utilisateur."
-                  message:
-                    type: string
-                    example: "Utilisateur créé avec succès."
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "403":
-          $ref: "#/components/responses/Forbidden"
-        "404":
-          $ref: "#/components/responses/NOTFOUND"
-        "500":
-          $ref: "#/components/responses/InternalError"
-      security:
-        - bearer-key: []
+#    post:
+#      tags:
+#        - Utilisateur
+#      summary: "Créer un nouvel utilisateur."
+#      operationId: "creeUtilisateur"
+#      requestBody:
+#        required: true
+#        content:
+#          application/json:
+#            schema:
+#              $ref: '#/components/schemas/UtilisateurCreationDto'
+#      responses:
+#        "201":
+#          description: "Compte utilisateur créé avec succès."
+#          content:
+#            application/json:
+#              schema:
+#                type: object
+#                properties:
+#                  id:
+#                    type: integer
+#                    description: "Identifiant unique généré pour l'utilisateur."
+#                  message:
+#                    type: string
+#                    example: "Utilisateur créé avec succès."
+#        "400":
+#          $ref: "#/components/responses/BadRequest"
+#        "401":
+#          $ref: "#/components/responses/Unauthorized"
+#        "403":
+#          $ref: "#/components/responses/Forbidden"
+#        "404":
+#          $ref: "#/components/responses/NOTFOUND"
+#        "500":
+#          $ref: "#/components/responses/InternalError"
+#      security:
+#        - bearer-key: []
 
   /utilisateurs/{utilisateurId}:
     get:
@@ -357,8 +400,68 @@ components:
           description: "Rôle de l'utilisateur"
           example: "USER"
 
+    UtilisateurCreationDto:
+      type: object
+      required:
+        - civilite
+        - fullName
+        - email
+      properties:
+        civilite:
+          type: string
+          description: "Civilité de l'utilisateur"
+          enum: [ M, MME ]
+          example: M
+        nom:
+          type: string
+          maxLength: 200
+          description: "Nom de l'utilisateur"
+          example: "Jean Dupont"
+        prenom:
+          type: string
+          maxLength: 200
+          description: "prénom de l'utilisateur "
+          example: "Jean Dupont"
+        email:
+          type: string
+          format: email
+          description: "Email de l'utilisateur"
+          example: "potter.harry@yopmail.com"
+        password:
+          type: string
+          maxLength: 200
+          description: "mot de passe de l'utilisateur"
+          example: "Test123!"
+        telephone:
+          type: string
+          description: "Numéro de téléphone de l'utilisateur"
+          example: "0836656565"
+        adresse:
+          type: string
+          description: "Adresse de l'utilisateur"
+          example: "4 Privet Drive"
+        codePostal:
+          type: string
+          description: "Code postal de l'utilisateur"
+          example: "75001"
+        ville:
+          type: string
+          description: "Ville de résidence de l'utilisateur"
+          example: "London"
+        pays:
+          type: string
+          description: "Pays de résidence de l'utilisateur"
+          example: "United Kingdom"
+
     UtilisateurUpdateDto:
       type: object
+      required:
+        - email
+        - nom
+        - prenom
+        - adresse
+        - codePostal
+        - ville
       properties:
         email:
           type: string
@@ -368,27 +471,21 @@ components:
           enum:
             - M
             - MME
-          nullable: true
           description: "Mise à jour de la civilité."
         telephone:
           type: string
-          nullable: true
           description: "Nouveau numéro de téléphone."
         adresse:
           type: string
-          nullable: true
           description: "Mise à jour de l'adresse."
         code_postal:
           type: string
-          nullable: true
           description: "Mise à jour du code postal."
         ville:
           type: string
-          nullable: true
           description: "Nouvelle ville."
         pays:
           type: string
-          nullable: true
           description: "Nouveau pays."
 
     UtilisateurPourRechercheDto:

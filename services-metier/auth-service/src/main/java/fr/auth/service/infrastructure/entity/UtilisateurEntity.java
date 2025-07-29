@@ -23,6 +23,12 @@ public class UtilisateurEntity extends BaseAuditingEntity {
     @Column(nullable = false, unique = true)
     private String email;
 
+    @Column(nullable = false)
+    private String password;
+
+    @Column(nullable = false)
+    private Boolean deleted = false;
+
     @Column(name = "civilite")
     private String civilite;
 
@@ -45,6 +51,7 @@ public class UtilisateurEntity extends BaseAuditingEntity {
 
     private String pays;
 
+    @Column(name = "statut_compte")
     @Enumerated(EnumType.STRING)
     private UserStatus statutCompte;
 

@@ -3,9 +3,7 @@ package fr.quittance.common.utils.mapper;
 import fr.quittance.common.enums.CiviliteEnum;
 import org.mapstruct.Named;
 import org.openapitools.jackson.nullable.JsonNullable;
-import org.springframework.stereotype.Component;
 
-@Component
 public class JsonNullableMapper {
 
     // Mapping générique : T -> JsonNullable<T>
@@ -20,16 +18,15 @@ public class JsonNullableMapper {
         return value != null && value.isPresent() ? value.get() : null;
     }
 
-    // Mapping spécifique : String -> JsonNullable<String>
+
     @Named("stringToJsonNullable")
     public static JsonNullable<String> stringToJsonNullable(String value) {
         return value == null ? JsonNullable.undefined() : JsonNullable.of(value);
     }
 
-    // Mapping spécifique : JsonNullable<String> -> String
     @Named("jsonNullableToString")
-    public static String jsonNullableToString(JsonNullable<String> jsonNullable) {
-        return jsonNullable != null && jsonNullable.isPresent() ? jsonNullable.get() : null;
+    public static String jsonNullableToString(JsonNullable<String> value) {
+        return (value != null && value.isPresent()) ? value.get() : null;
     }
 
     // Mapping spécifique : CiviliteEnum -> JsonNullable<CiviliteEnum>
@@ -43,4 +40,6 @@ public class JsonNullableMapper {
     public static CiviliteEnum jsonNullableToCivilite(JsonNullable<CiviliteEnum> jsonNullable) {
         return jsonNullable != null && jsonNullable.isPresent() ? jsonNullable.get() : null;
     }
+
+
 }
