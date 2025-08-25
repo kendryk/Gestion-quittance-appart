@@ -47,5 +47,5 @@ public interface IUtilisateurRepository {
      * @param utilisateur un objet {@link Utilisateur}
      * @return le mail de l'utilisateur
      */
-    Utilisateur update(Utilisateur utilisateur);
+    Utilisateur update(Utilisateur utilisateur) throws NotFoundException;
 }

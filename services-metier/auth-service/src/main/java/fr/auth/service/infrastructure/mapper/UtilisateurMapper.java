@@ -7,6 +7,7 @@ import fr.auth.service.infrastructure.entity.UtilisateurEntity;
 import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 
 import java.util.List;
 
@@ -24,4 +25,5 @@ public interface UtilisateurMapper {
 
     List<Utilisateur> listEntityToDomain(List<UtilisateurEntity> listUtilisateur);
 
+    void updateEntityFromDomain(Utilisateur utilisateur,  @MappingTarget UtilisateurEntity existingEntity);
 }

@@ -43,6 +43,14 @@ public interface IUtilisateurService {
     String deleteUtilisateur(String identifiantUtilisateur) throws NotFoundException;
 
     /**
+     * Restore a previously deleted user account based on the provided unique identifier.
+     *
+     * @param identifiantUtilisateur the unique identifier of the user to be restored.
+     * @return a message confirming the successful restoration of the user account.
+     */
+    String restoreUtilisateur(String identifiantUtilisateur) throws NotFoundException;
+
+    /**
      * Met à jour les informations d'un utilisateur.
      *
      * @param utilisateur les informations de l'utilisateur à mettre à jour.
@@ -50,4 +58,6 @@ public interface IUtilisateurService {
      * @throws NotFoundException si l'utilisateur à mettre à jour n'existe pas.
      */
     Utilisateur updateUtilisateur ( Utilisateur utilisateur) throws NotFoundException;
+
+
 }

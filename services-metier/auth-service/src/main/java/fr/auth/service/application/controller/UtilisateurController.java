@@ -51,6 +51,12 @@ public class UtilisateurController implements UtilisateursApi {
     }
 
     @Override
+    public ResponseEntity<Boolean> softRestoreUtilisateur(String identifiantUtilisateur) throws NotFoundException {
+        String response =  utilisateurService.restoreUtilisateur(identifiantUtilisateur);
+        return ResponseEntity.ok(response.isEmpty() ? Boolean.FALSE : Boolean.TRUE );
+    }
+
+    @Override
     public ResponseEntity<Boolean> updateUtilisateurById( Long utilisateurId, UtilisateurUpdateDto utilisateurUpdateDto) throws NotFoundException {
         log.info("Mise à jour de l'Utilisateur ID : {}", utilisateurId);
         // Vérifie si l'utilisateur existe et renvoie une erreur si non trouvé

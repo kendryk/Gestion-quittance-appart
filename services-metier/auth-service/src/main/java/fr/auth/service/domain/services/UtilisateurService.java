@@ -67,6 +67,16 @@ public class UtilisateurService implements IUtilisateurService {
     }
 
     @Override
+    public String restoreUtilisateur(String identifiantUtilisateur) throws NotFoundException {
+        Utilisateur utilisateur =  utilisateurRepository.rechercheUtilisateurByEmail(identifiantUtilisateur);
+        // On modifie le statut de l'utilisateur
+        utilisateur.setStatutCompte(UserStatus.ACTIF.name());
+        utilisateurRepository.update(utilisateur);
+        log.info("Modification réussie de l'utilisateur : {}", utilisateur);
+        return String.format("Succès de la modification de l'utilisateur : %s", utilisateur);
+    }
+
+    @Override
     public Utilisateur updateUtilisateur (Utilisateur utilisateur) throws NotFoundException {
         // Recherche de l'utilisateur en base à partir de son ID
         Utilisateur existingUtilisateur = utilisateurRepository.rechercheUtilisateur(utilisateur.getId());
@@ -94,6 +104,5 @@ public class UtilisateurService implements IUtilisateurService {
             throw new AppartementDejaLieException(MessageErreurEnum.CONFLICT_UTILISATEUR.getMessage());
         }
     }
-
 
 }

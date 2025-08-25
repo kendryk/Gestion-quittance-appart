@@ -9,8 +9,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Map;
-
 @RestController
 public class Verify2FAController implements Verify2faApi {
 
@@ -33,7 +31,7 @@ public class Verify2FAController implements Verify2faApi {
 
                 return ResponseEntity.ok(verify2faPost200Response);
             } else {
-                Map<String, String> errorResponse = Map.of("error", "Code 2FA invalide");
+//                Map<String, String> errorResponse = Map.of("error", "Code 2FA invalide");
                 return ResponseEntity
                         .status(HttpStatus.UNAUTHORIZED)
                         .body(null);

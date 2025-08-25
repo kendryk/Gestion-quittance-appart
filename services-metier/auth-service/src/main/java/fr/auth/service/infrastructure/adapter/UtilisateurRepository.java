@@ -37,7 +37,6 @@ public class UtilisateurRepository implements IUtilisateurRepository {
 
     @Override
     public Utilisateur rechercheUtilisateur(long utilisateurId) throws NotFoundException {
-
         log.info("Recherche de l'utilisateur avec ID : " + utilisateurId);
         return utilisateurJpaRepository.findById(utilisateurId)
                 .map(utilisateurMapper::entityToDomain)
@@ -57,7 +56,6 @@ public class UtilisateurRepository implements IUtilisateurRepository {
 
     @Override
     public Utilisateur rechercheUtilisateurByEmail(String identifiantUtilisateur) throws NotFoundException {
-
         return utilisateurJpaRepository.findByEmail(identifiantUtilisateur)
                 .filter(utilisateur -> !utilisateur.getEmail().isEmpty())
                 .map(utilisateurMapper::entityToDomain)
@@ -70,10 +68,16 @@ public class UtilisateurRepository implements IUtilisateurRepository {
     }
 
     @Override
-    public Utilisateur update(Utilisateur utilisateur) {
-        UtilisateurEntity utilisateurEntity = utilisateurMapper.domainToEntity(utilisateur);
+    public Utilisateur update(Utilisateur utilisateur) throws NotFoundException {
+        // Récupère l'entité existante (managée par JPA)
+        UtilisateurEntity existingEntity = utilisateurJpaRepository.findById(utilisateur.getId())
+                .orElseThrow( () -> new NotFoundException("Utilisateur non trouvé"));
+
+                // Met à jour uniquement les champs nécessaires
+        utilisateurMapper.updateEntityFromDomain(utilisateur, existingEntity);
+
         log.info("Sauvegarde de l'utilisateur dans le dépôt");
-        utilisateurJpaRepository.save(utilisateurEntity);
-        return utilisateur;
+        utilisateurJpaRepository.save(existingEntity);
+        return utilisateurMapper.entityToDomain(existingEntity);
     }
 }

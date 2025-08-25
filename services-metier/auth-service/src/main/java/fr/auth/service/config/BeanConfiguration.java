@@ -1,4 +1,4 @@
-package fr.auth.service.configuration;
+package fr.auth.service.config;
 
 import fr.auth.service.AuthServiceApplication;
 import fr.auth.service.domain.repository.IUtilisateurRepository;

@@ -135,44 +135,6 @@ paths:
       security:
         - bearer-key: []
 
-#    post:
-#      tags:
-#        - Utilisateur
-#      summary: "Créer un nouvel utilisateur."
-#      operationId: "creeUtilisateur"
-#      requestBody:
-#        required: true
-#        content:
-#          application/json:
-#            schema:
-#              $ref: '#/components/schemas/UtilisateurCreationDto'
-#      responses:
-#        "201":
-#          description: "Compte utilisateur créé avec succès."
-#          content:
-#            application/json:
-#              schema:
-#                type: object
-#                properties:
-#                  id:
-#                    type: integer
-#                    description: "Identifiant unique généré pour l'utilisateur."
-#                  message:
-#                    type: string
-#                    example: "Utilisateur créé avec succès."
-#        "400":
-#          $ref: "#/components/responses/BadRequest"
-#        "401":
-#          $ref: "#/components/responses/Unauthorized"
-#        "403":
-#          $ref: "#/components/responses/Forbidden"
-#        "404":
-#          $ref: "#/components/responses/NOTFOUND"
-#        "500":
-#          $ref: "#/components/responses/InternalError"
-#      security:
-#        - bearer-key: []
-
   /utilisateurs/{utilisateurId}:
     get:
       tags:
@@ -243,6 +205,7 @@ paths:
       security:
         - bearer-key: [ ]
 
+  /utilisateurs/{utilisateurId}/delete:
     patch:
       tags:
         - Utilisateur
@@ -271,7 +234,38 @@ paths:
         500:
           $ref: '#/components/responses/InternalError'
       security:
-        - bearer-key: []
+        - bearer-key: [ ]
+
+  /utilisateurs/{utilisateurId}/restore:
+    patch:
+      tags:
+        - Utilisateur
+      summary: "Marquer un utilisateur comme restauré (soft restore)"
+      description: "L'utilisateur son statut est mis à jour."
+      operationId: "softRestoreUtilisateur"
+      parameters:
+        - name: utilisateurId
+          in: path
+          required: true
+          schema:
+            type: string
+            description: L'identifant du compte à modifier
+            example: john.doe@test.com
+      responses:
+        200:
+          $ref: '#/components/responses/OK'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        403:
+          $ref: '#/components/responses/Forbidden'
+        404:
+          $ref: '#/components/responses/NOTFOUND'
+        500:
+          $ref: '#/components/responses/InternalError'
+      security:
+        - bearer-key: [ ]
 
 components:
   responses:
@@ -536,14 +530,3 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT
-
-
-
-
-
-
-
-
-
-
-
