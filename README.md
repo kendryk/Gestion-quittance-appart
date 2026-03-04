@@ -81,6 +81,7 @@ Le projet est structuré en plusieurs modules Maven, favorisant la séparation d
   ```
 - Démarrer un service :
   ```bash
+  mvn spring-boot:run -pl services-techniques/config
   mvn spring-boot:run -pl services-metier/auth-service
   mvn spring-boot:run -pl services-metier/quittance-service
   ```
