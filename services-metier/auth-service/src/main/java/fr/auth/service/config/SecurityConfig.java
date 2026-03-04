@@ -52,7 +52,7 @@ public class SecurityConfig {
                 // 3. Autorisations pour les requêtes HTTP.
                 .authorizeHttpRequests(auth -> auth
                         // Autoriser toutes les requêtes commençant par `/auth/**` sans authentification.
-                        .requestMatchers("/login", "verify-2fa", "/register").permitAll()
+                        .requestMatchers("/login", "/verify-2fa", "/register").permitAll()
                         .requestMatchers("/admin").hasRole("ADMIN")
                         .requestMatchers("/user").hasAnyRole("USER", "ADMIN")
                         .requestMatchers("/utilisateurs").hasRole("ADMIN")
