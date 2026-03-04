@@ -3,8 +3,8 @@ package fr.auth.service.application.controller;
 
 import fr.auth.service.domain.services.AuthService;
 import fr.authservice.application.controller.Verify2faApi;
-import fr.authservice.domain.model.Verify2faPost200Response;
-import fr.authservice.domain.model.Verify2faPostRequest;
+import fr.authservice.domain.model.Verify2FAPostRequest;
+import fr.authservice.domain.model.Verify2FAResponseDto;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,11 +21,11 @@ public class Verify2FAController implements Verify2faApi {
     }
 
     @Override
-    public ResponseEntity<Verify2faPost200Response> verify2faPost(Verify2faPostRequest request) {
+    public ResponseEntity<Verify2FAResponseDto> verify2faPost(Verify2FAPostRequest request) {
         try {
             if (authService.verifyCode(request.getIdentifiantUtilisateur(), request.getCode2fa())) {
                 String token = authService.generateJwtToken(request.getIdentifiantUtilisateur());
-                Verify2faPost200Response verify2faPost200Response = new Verify2faPost200Response();
+                Verify2FAResponseDto verify2faPost200Response = new Verify2FAResponseDto();
                 verify2faPost200Response.setToken(token);
                 verify2faPost200Response.setStatus("success");
 

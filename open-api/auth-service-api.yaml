@@ -14,6 +14,7 @@ tags:
 paths:
   /login:
     post:
+      operationId: loginPost
       summary: Login utilisateur
       description: Permet à un utilisateur de s'authentifier
       requestBody:
@@ -21,24 +22,24 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                identifiantUtilisateur:
-                  type: string
-                password:
-                  type: string
+              $ref: '#/components/schemas/LoginPostRequest'
       responses:
         '200':
           description: Succès
           content:
             application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/LoginResponseDto'
         '401':
           description: Identifiants invalides
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
 
   /verify-2fa:
     post:
+      operationId: verify2faPost
       summary: Vérification 2FA
       description: Permet de vérifier un code 2FA et de générer un token.
       requestBody:
@@ -46,28 +47,20 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                identifiantUtilisateur:
-                  type: string
-                code2fa:
-                  type: string
+              $ref: '#/components/schemas/Verify2FAPostRequest'
       responses:
         '200':
           description: Succès
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  token:
-                    type: string
-                    description: Le token JWT à utiliser dans l’en-tête Authorization
-                  status:
-                    type: string
-                    example: success
+                $ref: '#/components/schemas/Verify2FAResponseDto'
         '401':
           description: Code invalide
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
 
   /register:
     post:
@@ -332,6 +325,16 @@ components:
         label:
           type: "string"
 
+    LoginResponseDto:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        code2fa:
+          type: string
+          example: "496827"
+
     UtilisateurDto:
       type: object
       properties:
@@ -508,6 +511,33 @@ components:
           format: email
           description: "Adresse email de l'utilisateur"
           example: "potter.harry@yopmail.com"
+
+    LoginPostRequest:
+      type: object
+      required: [ identifiantUtilisateur, password ]
+      properties:
+        identifiantUtilisateur:
+          type: string
+        password:
+          type: string
+
+    Verify2FAPostRequest:
+      type: object
+      required: [ identifiantUtilisateur, code2fa ]
+      properties:
+        identifiantUtilisateur:
+          type: string
+        code2fa:
+          type: string
+
+    Verify2FAResponseDto:
+      type: object
+      properties:
+        token:
+          type: string
+        status:
+          type: string
+          example: success
 
     ErrorResponse:
       type: object
